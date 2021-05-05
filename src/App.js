@@ -1,122 +1,73 @@
 import React from 'react';
+import 'bulma/css/bulma.css';
+import foods from './foods.json';
+
 import FoodBox from './components/FoodBox'
 import AddFood from './components/AddFood'
-import foods from './foods.json';
-import FoodList from './components/FoodList'
-import './App.css';
-import 'bulma/css/bulma.css';
-
+import Search from './components/Search'
+// import FoodList from './components/FoodList'
 
 class App extends React.Component {
-  constructor(props){
-    super(props)
-    this.state = {
-      foods: foods,
-      filteredFoods: foods,
-      formShow: false,
-      todayFoods: []
-    }
+
+  state = {
+    foods: foods,
+    filteredFoods: foods,
+    showForm: false
   }
-  
+
+  handleForm = () => {
+    this.setState({
+      showForm: !this.state.showForm,
+    });
+  }
 
   handleAdd = (event) => {
-    event.preventDefault()
-    let foodName = event.currentTarget.foodName.value
-    let foodCalories  = event.currentTarget.foodCalories.value
-    let foodImage = event.currentTarget.foodImage.value
+    event.preventDefault();
+    let foodName = event.target.foodName.value
+    let foodCalories = event.target.foodCalories.value
+    let foodImage = event.target.foodImage.value
 
-    let newFood = [
-      {
-        name: foodName,
-        calories: foodCalories,
-        image: foodImage,
-      }, ...this.state.foods]
-
+    const newFood = {name: foodName, calories: foodCalories, image: foodImage}
+    
     this.setState({
-      foods: newFood,
-      formShow: false
+      foods: [newFood, ...this.state.foods],
+      showForm: false
     })
+
   }
 
-  handleShowForm = () => {
+  handleSearch = (event) =>{
+    let searchText = event.target.value.toLowerCase()
+
+    let filteredList = this.state.foods.filter((elem) =>{
+      return elem.name.toLowerCase().includes(searchText)
+    })
+
     this.setState({
-      formShow: true
+      filteredFoods: filteredList
     })
   }
-
-  handleSearch = (event) => {
-    let searchName = event.currentTarget.value
-    let cloneFoods = this.state.foods.filter((item) => {
-      return item.name.startsWith(searchName)
-    })
-
-    this.setState({
-      filteredFoods: cloneFoods
-    })
-  }
-
-  //ITERATION 5
-
-  handleToday = (event) =>{
-    let foodName = event.currentTarget.food.name.value
-    let foodCalories = event.currentTarget.food.calories.value
-    let foodQuantity = event.currentTarget.food.quantity.value
-
-
-    let newFood = [
-        {
-
-        name:      foodName, 
-        calories:   foodCalories,
-        quantity:   foodQuantity 
-
-        }, ...this.state.TodayFoods]
-
-    this.setState({
-      TodayFoods: newFood
-    })
-}
-
+ 
   render(){
+    const {foods, filteredFoods, showForm} =this.state
     return (
       <div>
- 
-          {
-           this.state.formShow ? <AddFood onAdd={this.handleAdd}/> : <button onClick ={this.handleShowForm}>Add Food</button>
-          }
-
-          <input 
-            type="text" 
-            onChange={this.handleSearch}
-            placeholder="Search">
-          </input>
-
-         
+        <h1>IronNutrition</h1>
         
+        <Search onSearch={this.handleSearch}/>
+        <button onClick={this.handleForm}>Show Form</button>
         {
-          this.state.foods.map((food, index) =>{
-            return(
-            <FoodBox  
-            food={food} 
-            />) 
+          showForm ? 
+          <AddFood onAdd={this.handleAdd} />
+          :
+          null
+        
+        }
+        {
+          filteredFoods.map((elem, index) => {
+            return <FoodBox key={index} foods={elem}/>
           })
-          
-        }  
-
-        <div>
-          <h4>Today's Food</h4>
-          <ul>
-            {
-              this.state.TodayFoods.map((todayFood, i) => {
-                return <FoodList 
-                todayFood={todayFood} 
-                key={'todayfood' + i}
-                id={i}
-                />
-            })
-          }
-          </ul>          
-        </div>        
+        }
         
       </div>
     )
