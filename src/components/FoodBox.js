@@ -1,8 +1,21 @@
 import React from 'react'
 
 class FoodBox extends React.Component {
+  state = {
+    quantity: 1,
+    name: '',
+    
+  }
+
+  handleChange = (event) =>{
+    this.setState({
+      quantity: Number(event.target.value)
+    })
+  }
+
   render(){
-    const{name, calories, image, quantity} = this.props.foods
+    const{name, calories, image} = this.props.foods
+    const{quantity} = this.state
 
     return (
       <div className="box">
@@ -23,17 +36,17 @@ class FoodBox extends React.Component {
         <div className="media-right">
           <div className="field has-addons">
             <div className="control">
-              <input className="input" type="number" />
+              <input onChange={this.handleChange} className="input" type="number" value={this.state.quantity}/>
             </div>
             <div className="control">
-              <button className="button is-info">
+              <button onClick={() => this.props.onToday(this.props.foods, quantity)} className="button is-info">
                 +
               </button>
             </div>
           </div>
         </div>
       </article>
-</div>
+      </div>
     )
   }
 }

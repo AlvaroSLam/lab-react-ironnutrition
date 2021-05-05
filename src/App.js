@@ -5,14 +5,15 @@ import foods from './foods.json';
 import FoodBox from './components/FoodBox'
 import AddFood from './components/AddFood'
 import Search from './components/Search'
-// import FoodList from './components/FoodList'
+import FoodList from './components/FoodList'
 
 class App extends React.Component {
 
   state = {
     foods: foods,
     filteredFoods: foods,
-    showForm: false
+    showForm: false,
+    todaysFoods: []
   }
 
   handleForm = () => {
@@ -47,15 +48,28 @@ class App extends React.Component {
       filteredFoods: filteredList
     })
   }
+
+  handleToday = (foods, quantity) => {
+    let newObject = {
+      name: foods.name,
+      calories: foods.calories,
+      quantity,
+    }
+
+    this.setState({
+      todaysFoods: [...this.state.todaysFoods, newObject]
+    })
+  }
  
   render(){
-    const {foods, filteredFoods, showForm} =this.state
+    const {foods, filteredFoods, showForm, todaysFoods} =this.state
     return (
       <div>
         <h1>IronNutrition</h1>
         
         <Search onSearch={this.handleSearch}/>
         <button onClick={this.handleForm}>Show Form</button>
+        
         {
           showForm ? 
           <AddFood onAdd={this.handleAdd} />
@@ -63,11 +77,22 @@ class App extends React.Component {
           null
         
         }
-        {
-          filteredFoods.map((elem, index) => {
-            return <FoodBox key={index} foods={elem}/>
-          })
-        }
+        <div className='columns'>
+          <div className='column'>
+            {
+              filteredFoods.map((elem, index) => {
+                return <FoodBox 
+                  key={index} 
+                  foods={elem}
+                  onToday={this.handleToday}
+                  />
+              })
+            }
+            </div>
+          <div className='column'>
+            <FoodList data={todaysFoods}/>
+          </div>
+        </div>
         
       </div>
     )
