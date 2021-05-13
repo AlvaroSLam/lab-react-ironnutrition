@@ -1,16 +1,15 @@
-
 import React from 'react'
 
-function AdFood(props){
-    return(
-       <form onSubmit={props.onAdd}>
-           <input name="foodName" type="text" placeholder="Food Name"></input>
-           <input name="foodCalories" type="text" placeholder="Food Calories"></input>
-           <input name="foodImage" type="text" placeholder="Food Image"></input>
-           <button type='submit'>SUBMIT!</button>
-       </form>
-        
+
+function AddForm({onAdd}) {
+    return (
+        <form onSubmit={onAdd}>
+            <input name="name" type="text" placeholder="Enter Name"/>
+            <input name="image" type="text" placeholder="Enter Image Url"/>
+            <input name="calories" type="number" />
+            <button type="submit">Add Item</button>
+        </form>
     )
 }
 
-export default AdFood
+export default AddForm

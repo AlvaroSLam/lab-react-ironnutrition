@@ -1,103 +1,97 @@
-import React from 'react';
+import React, {useState} from 'react';
 import 'bulma/css/bulma.css';
-import foods from './foods.json';
+import foodsJSON from './foods.json';
 
 import FoodBox from './components/FoodBox'
 import AddFood from './components/AddFood'
-import Search from './components/Search'
 import FoodList from './components/FoodList'
 
-class App extends React.Component {
+const App = () => {
+  const [OGfoods, setOGfoods] = useState(foodsJSON)
+  const [foods, setFoods] = useState(foodsJSON)
+  const [showForm, setShowForm] = useState(false)
+  const [todayFoods, setTodayFoods] = useState([])
 
-  state = {
-    foods: foods,
-    filteredFoods: foods,
-    showForm: false,
-    todaysFoods: []
+  const addFood = (event) => {
+    event.preventDefault()
+      const {name, calories, image} = event.target
+      let newItem = {
+        name: name.value,
+        calories: calories.value,
+        image: image.value
+      }
+    setFoods([newItem, ...foods])
+    setShowForm(false)
   }
 
-  handleForm = () => {
-    this.setState({
-      showForm: !this.state.showForm,
-    });
-  }
+  const handleSearch = (event) =>{
+    let word = event.target.value.toLowerCase()
 
-  handleAdd = (event) => {
-    event.preventDefault();
-    let foodName = event.target.foodName.value
-    let foodCalories = event.target.foodCalories.value
-    let foodImage = event.target.foodImage.value
-
-    const newFood = {name: foodName, calories: foodCalories, image: foodImage}
-    
-    this.setState({
-      foods: [newFood, ...this.state.foods],
-      showForm: false
+    let filteredList =  OGfoods.filter((elem) =>{
+      return elem.name.toLowerCase().includes(word)
     })
+    setFoods(filteredList)
+  }
+  
+  const handleToday = (food, quantity) => {
+       
+    let cloneFoods = JSON.parse(JSON.stringify(todayFoods))
+      let isFoodPresent = false
+      for (let i=0; i<cloneFoods.length; i++ ) {
+          if (cloneFoods[i].name == food.name){
+            cloneFoods[i].quantity = cloneFoods[i].quantity + quantity
+              isFoodPresent = true
+              break;
+          }
+      }
 
+      if (isFoodPresent) {
+        setTodayFoods(cloneFoods)
+      }
+      else {
+        let newFood = {
+          name: food.name,
+          calories: food.calories,
+          quantity: quantity,
+        }
+  
+        setTodayFoods([...todayFoods, newFood])
+      }  
   }
 
-  handleSearch = (event) =>{
-    let searchText = event.target.value.toLowerCase()
-
-    let filteredList = this.state.foods.filter((elem) =>{
-      return elem.name.toLowerCase().includes(searchText)
-    })
-
-    this.setState({
-      filteredFoods: filteredList
-    })
-  }
-
-  handleToday = (foods, quantity) => {
-    let newObject = {
-      name: foods.name,
-      calories: foods.calories,
-      quantity,
+  return (
+    <>
+     <h1>IronNutrition</h1>
+    <input onChange={handleSearch} type='text'/>
+    <br />
+    {
+      showForm ? 
+      <AddFood onAdd={addFood}/>
+      :
+      <button onClick={() => setShowForm(true)}>Form</button>
     }
 
-    this.setState({
-      todaysFoods: [...this.state.todaysFoods, newObject]
-    })
-  }
- 
-  render(){
-    const {foods, filteredFoods, showForm, todaysFoods} =this.state
-    return (
-      <div>
-        <h1>IronNutrition</h1>
-        
-        <Search onSearch={this.handleSearch}/>
-        <button onClick={this.handleForm}>Show Form</button>
-        
-        {
-          showForm ? 
-          <AddFood onAdd={this.handleAdd} />
-          :
-          null
-        
-        }
-        <div className='columns'>
-          <div className='column'>
-            {
-              filteredFoods.map((elem, index) => {
-                return <FoodBox 
-                  key={index} 
-                  foods={elem}
-                  onToday={this.handleToday}
-                  />
-              })
-            }
-            </div>
-          <div className='column'>
-            <FoodList data={todaysFoods}/>
-          </div>
-        </div>
-        
+    <div class="columns">
+      <div class="column">
+      {
+        foods.map((elem, idx) =>{
+          return <FoodBox 
+            foods={elem}
+            key={idx}
+            onToday={handleToday}
+          />
+        })
+      }
       </div>
-    )
-  }
-}
 
+      <div class="column">
+        <FoodList todayFoods={todayFoods}/>
+      </div>
+      
+    </div>
+      
+    </>
+  )
+}
 
 export default App;

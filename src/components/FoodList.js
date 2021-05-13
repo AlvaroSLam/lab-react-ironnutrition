@@ -1,24 +1,18 @@
-import React from 'react'
+import React, {useState} from 'react'
 
-class FoodList extends React.Component{
-    render() {
-        const {data} = this.props
-
-        let total = data.reduce((acc, elem) =>{
-            return acc + (elem.calories * elem.quantity)
-        }, 0)
+const FoodList = ({todayFoods}) => {
+    console.log(todayFoods)
+    return (
+        <>
+        <h1>Today's Foods</h1>
         
-        return(
-            <div>
-                <h3><b>Today's Food</b></h3>
-              {
-                  data.map((elem) =>{
-                      return <p>{elem.name} {elem.quantity} = {elem.quantity * elem.calories} calories</p>
-                  })
-              }
-              <h1>TOTAL: {total} cal</h1>
-            </div>
-        )
-    }
+        {
+            todayFoods.map((elem) =>{
+                return <p>{elem.quantity} {elem.name} = {elem.quantity * elem.calories}</p>
+            })
+        }
+        </>
+    )
 }
+
  export default FoodList
